@@ -10,6 +10,8 @@ Text Domain: wc-banorte-payworks
 Domain Path: /languages
 WC requires at least: 3.0.0
 WC tested up to: 8.4.0
+Requires PHP: 7.2
+WooCommerce: true
 */
 
 // Prevenir acceso directo
@@ -21,6 +23,13 @@ if (!defined('ABSPATH')) {
 define('WC_BANORTE_VERSION', '1.0.0');
 define('WC_BANORTE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WC_BANORTE_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+require_once plugin_dir_path(__FILE__) . 'includes/class-wc-banorte-payworks-activator.php';
+
+// Hooks de activación/desactivación
+register_activation_hook(__FILE__, array('WC_Banorte_Payworks_Activator', 'activate'));
+register_deactivation_hook(__FILE__, array('WC_Banorte_Payworks_Activator', 'deactivate'));
+register_uninstall_hook(__FILE__, array('WC_Banorte_Payworks_Activator', 'uninstall'));
 
 /**
  * Verificar que todos los archivos necesarios existen
@@ -107,6 +116,14 @@ function add_banorte_payworks_gateway($gateways) {
     }
     return $gateways;
 }
+
+// Declarar compatibilidad con características de WooCommerce
+add_action('before_woocommerce_init', function() {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+    }
+});
 
 // Inicializar el plugin cuando todos los plugins estén cargados
 add_action('plugins_loaded', 'init_banorte_payworks_gateway');

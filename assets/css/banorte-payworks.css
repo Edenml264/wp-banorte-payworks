@@ -19,14 +19,30 @@
 #banorte-payworks-form input[type="text"] {
     width: 100%;
     padding: 8px 12px;
+    padding-right: 40px; /* Espacio para el icono */
     font-size: 14px;
     line-height: 1.5;
     color: #495057;
     background-color: #fff;
-    background-clip: padding-box;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: auto 20px;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: all .15s ease-in-out;
+}
+
+/* Iconos de tarjetas */
+#banorte_card_number.visa {
+    background-image: url('../images/visa.png');
+}
+
+#banorte_card_number.mastercard {
+    background-image: url('../images/mastercard.png');
+}
+
+#banorte_card_number.amex {
+    background-image: url('../images/amex.png');
 }
 
 #banorte-payworks-form input[type="text"]:focus {
@@ -39,6 +55,7 @@
 
 #banorte-payworks-form input[type="text"].error {
     border-color: #dc3545;
+    background-color: #fff8f8;
 }
 
 #banorte-payworks-form .required {
@@ -46,16 +63,24 @@
     margin-left: 2px;
 }
 
-/* Estilos responsivos */
-@media screen and (max-width: 768px) {
-    #banorte-payworks-form .form-row-first,
-    #banorte-payworks-form .form-row-last {
+/* Layout responsivo */
+@media screen and (min-width: 768px) {
+    .form-row-first {
+        float: left;
+        width: 47%;
+        margin-right: 3%;
+    }
+    .form-row-last {
+        float: right;
+        width: 47%;
+    }
+    .form-row-wide {
+        clear: both;
         width: 100%;
-        float: none;
     }
 }
 
-/* Estilos para mensajes de error */
+/* Mensajes de error */
 .woocommerce-error {
     margin: 0 0 20px;
     padding: 1em 2em 1em 3.5em;
@@ -64,16 +89,19 @@
     color: #721c24;
     border-radius: 4px;
     position: relative;
+    list-style: none;
 }
 
-/* Estilos para el icono de tarjeta */
-.payment_method_banorte_payworks img {
-    max-height: 40px;
-    margin-left: 10px;
-    vertical-align: middle;
+.woocommerce-error::before {
+    content: "\f071";
+    font-family: "Font Awesome 5 Free";
+    position: absolute;
+    left: 1.5em;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-/* Estilos para campos deshabilitados */
+/* Campos deshabilitados */
 #banorte-payworks-form input[type="text"]:disabled {
     background-color: #e9ecef;
     cursor: not-allowed;
@@ -88,4 +116,22 @@
 
 #banorte-payworks-form input[type="text"].error {
     animation: shake 0.6s ease-in-out;
+}
+
+/* Información de la tarjeta */
+.banorte-card-info {
+    background: #f8f8f8;
+    padding: 1em;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 1.5em;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Clearfix */
+.form-row::after {
+    content: "";
+    display: table;
+    clear: both;
 }
