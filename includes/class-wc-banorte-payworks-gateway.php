@@ -32,6 +32,7 @@ class WC_Banorte_Payworks_Gateway extends WC_Payment_Gateway {
         $this->description = $this->get_option('description');
         $this->enabled = $this->get_option('enabled');
         $this->testmode = 'yes' === $this->get_option('testmode');
+        $this->logging = 'yes' === $this->get_option('logging');
         $this->merchant_id = $this->get_option('merchant_id');
         $this->terminal_id = $this->get_option('terminal_id');
         $this->user_id = $this->get_option('user_id');
@@ -82,6 +83,14 @@ class WC_Banorte_Payworks_Gateway extends WC_Payment_Gateway {
                 'label'       => __('Habilitar modo de pruebas', 'wc-banorte-payworks'),
                 'type'        => 'checkbox',
                 'description' => __('Coloca el gateway en modo de pruebas.', 'wc-banorte-payworks'),
+                'default'     => 'yes',
+                'desc_tip'    => true,
+            ),
+            'logging' => array(
+                'title'       => __('Logging', 'wc-banorte-payworks'),
+                'label'       => __('Habilitar logs', 'wc-banorte-payworks'),
+                'type'        => 'checkbox',
+                'description' => __('Guarda logs detallados de las transacciones en WooCommerce > Estado > Logs.', 'wc-banorte-payworks'),
                 'default'     => 'yes',
                 'desc_tip'    => true,
             ),

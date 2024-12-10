@@ -10,6 +10,7 @@ class WC_Banorte_Payworks_API {
     private $password;
     private $test_mode;
     private $api_endpoint;
+    private $logger;
 
     public function __construct($merchant_id, $terminal_id, $user_id, $password, $test_mode = false) {
         $this->merchant_id = $merchant_id;
@@ -18,6 +19,7 @@ class WC_Banorte_Payworks_API {
         $this->password = $password;
         $this->test_mode = $test_mode;
         $this->api_endpoint = $test_mode ? 'https://wppsandbox.mit.com.mx' : 'https://wpp.banorte.com';
+        $this->logger = new WC_Banorte_Payworks_Logger();
     }
 
     /**
@@ -52,10 +54,18 @@ class WC_Banorte_Payworks_API {
             'entry_mode' => 'MANUAL'
         );
 
-        // Realizar la petición a la API
-        $response = $this->make_request($endpoint, $transaction_data);
+        $this->logger->info(sprintf('Iniciando proceso de pago para orden #%s', $order_id));
         
-        return $this->process_response($response);
+        try {
+            // Realizar la petición a la API
+            $response = $this->make_request($endpoint, $transaction_data, $order_id);
+            $this->logger->log_transaction($order_id, 'payment', $response);
+            
+            return $this->process_response($response);
+        } catch (Exception $e) {
+            $this->logger->error(sprintf('Error en proceso de pago para orden #%s: %s', $order_id, $e->getMessage()));
+            throw $e;
+        }
     }
 
     /**
@@ -83,15 +93,23 @@ class WC_Banorte_Payworks_API {
             'reference' => $transaction_id
         );
 
-        $response = $this->make_request($endpoint, $refund_data);
+        $this->logger->info(sprintf('Iniciando reembolso para orden #%s', $order_id));
         
-        return $this->process_response($response);
+        try {
+            $response = $this->make_request($endpoint, $refund_data, $order_id);
+            $this->logger->log_transaction($order_id, 'refund', $response);
+            
+            return $this->process_response($response);
+        } catch (Exception $e) {
+            $this->logger->error(sprintf('Error en reembolso para orden #%s: %s', $order_id, $e->getMessage()));
+            throw $e;
+        }
     }
 
     /**
      * Realiza la petición HTTP a la API de Banorte
      */
-    private function make_request($endpoint, $data) {
+    private function make_request($endpoint, $data, $order_id = '') {
         $args = array(
             'body' => json_encode($data),
             'headers' => array(
@@ -102,14 +120,21 @@ class WC_Banorte_Payworks_API {
             'sslverify' => true
         );
 
+        $this->logger->log_api_response($endpoint, $data, 'Enviando request...', $order_id);
+
         $response = wp_remote_post($endpoint, $args);
 
         if (is_wp_error($response)) {
+            $this->logger->log_api_error($endpoint, $response->get_error_message(), $data, $order_id);
             throw new Exception($response->get_error_message());
         }
 
         $body = wp_remote_retrieve_body($response);
-        return json_decode($body, true);
+        $decoded_response = json_decode($body, true);
+
+        $this->logger->log_api_response($endpoint, $data, $decoded_response, $order_id);
+
+        return $decoded_response;
     }
 
     /**
