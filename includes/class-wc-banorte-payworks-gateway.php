@@ -9,6 +9,51 @@ class WC_Banorte_Payworks_Gateway extends WC_Payment_Gateway {
     /** @var WC_Banorte_Payworks_API */
     private $api;
 
+    /** @var string */
+    public $id;
+
+    /** @var string */
+    public $icon;
+
+    /** @var bool */
+    public $has_fields;
+
+    /** @var string */
+    public $method_title;
+
+    /** @var string */
+    public $method_description;
+
+    /** @var array */
+    public $supports;
+
+    /** @var string */
+    public $title;
+
+    /** @var string */
+    public $description;
+
+    /** @var string */
+    public $enabled;
+
+    /** @var bool */
+    public $testmode;
+
+    /** @var bool */
+    public $logging;
+
+    /** @var string */
+    public $merchant_id;
+
+    /** @var string */
+    public $terminal_id;
+
+    /** @var string */
+    public $user_id;
+
+    /** @var string */
+    public $password;
+
     public function __construct() {
         $this->id = 'banorte_payworks';
         $this->icon = apply_filters('woocommerce_banorte_icon', '');
